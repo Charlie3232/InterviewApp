@@ -181,7 +181,7 @@ input,textarea,select{font-family:inherit;font-size:16px}
 </div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwhFINcsEqsShct258untuwOjOMNt86welmDU8bETuQ5xZIyR_kaiRsDQHzHX8v6KOYbw/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxF-HlkTcaBo-3bN0AD-ZfiBoKxoPZQIgye9m-ReoEjt2Ol60FR8_ze5Qn3RHymIfEagA/exec";
 const DIMENSIONS = ["月薪","年薪","上班地點","工作內容","公司福利與氣氛","工作時數"];
 const STATUSES = ["投遞中","已排面試","面試完成","等通知","收到Offer","已婉拒","未錄取"];
 const STATUS_STYLE = {
@@ -222,23 +222,37 @@ const QUOTES=[
 const QUOTE_IDX=Math.floor(Math.random()*QUOTES.length);
 
 let state={
-  interviews:[
-    {id:"i1",company:"台積電",position:"製程整合工程師",date:isoOffset(3),time:"14:00",endTime:"15:30",mode:"線上",round:"二面",status:"已排面試",notes:"準備製程良率題"},
-    {id:"i2",company:"聯發科",position:"數位IC設計",date:isoOffset(7),time:"10:30",endTime:"12:00",mode:"實體",round:"一面",status:"等通知",notes:""},
-    {id:"i3",company:"鴻海",position:"韌體工程師",date:isoOffset(-2),time:"15:00",endTime:"16:00",mode:"線上",round:"HR面",status:"面試完成",notes:"談薪資範圍 4.5~5 萬"},
-    {id:"i4",company:"台積電",position:"初面測驗",date:isoToday(),time:"09:30",endTime:"10:30",mode:"線上",round:"一面",status:"已排面試",notes:""},
-  ],
-  offers:[
-    {id:"o1",company:"聯發科",position:"數位IC設計",month:62000,year:1100000,location:"新竹",info:"分紅另計，年保證14個月",ratings:{"月薪":5,"年薪":5,"上班地點":4,"工作內容":5,"公司福利與氣氛":4,"工作時數":3},bonuses:["股票","遠端1天"]},
-    {id:"o2",company:"台達電",position:"電源工程師",month:55000,year:880000,location:"桃園",info:"三節獎金優",ratings:{"月薪":4,"年薪":4,"上班地點":3,"工作內容":4,"公司福利與氣氛":4,"工作時數":4},bonuses:["彈性上下班"]},
-  ],
+  interviews:[],
+  offers:[],
   weekStart:getWeekStart(new Date()),
   tab:"cal"
 };
 
-async function apiLoad(){if(!GAS_URL)return;showToast("資料載入中…");try{const r=await fetch(GAS_URL);const d=await r.json();if(d.interviews)state.interviews=d.interviews;if(d.offers)state.offers=d.offers;renderAll();showToast("資料已同步 ✓");}catch(e){showToast("載入失敗，使用本機資料");}}
-async function apiSave(type,data){if(!GAS_URL)return;try{await fetch(GAS_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"save",type,data})});}catch(e){}}
-async function apiDelete(type,id){if(!GAS_URL)return;try{await fetch(GAS_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"delete",type,id})});}catch(e){}}
+async function apiLoad(){
+  if(!GAS_URL){showToast("⚠️ 請先填入 GAS_URL");return;}
+  showToast("資料載入中…");
+  try{
+    const r=await fetch(GAS_URL+"?t="+Date.now());
+    const d=await r.json();
+    if(d.interviews)state.interviews=d.interviews;
+    if(d.offers)state.offers=d.offers;
+    renderAll();showToast("資料已同步 ✓");
+  }catch(e){showToast("❌ 載入失敗："+e.message);}
+}
+async function apiSave(type,data){
+  if(!GAS_URL)return;
+  try{
+    const r=await fetch(GAS_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"save",type,data})});
+    const t=await r.text();
+    if(t!=="ok") throw new Error(t);
+  }catch(e){showToast("❌ 儲存失敗："+e.message);}
+}
+async function apiDelete(type,id){
+  if(!GAS_URL)return;
+  try{
+    await fetch(GAS_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"delete",type,id})});
+  }catch(e){showToast("❌ 刪除失敗："+e.message);}
+}
 
 function isoToday(){return isoOffset(0);}
 function isoOffset(days){const d=new Date();d.setDate(d.getDate()+days);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
@@ -458,13 +472,15 @@ function openInterviewSheet(it){
   openSheet(isEdit?"編輯面試":"新增面試",html);
   let mode=e.mode;
   document.querySelectorAll("#f-mode button").forEach(b=>b.onclick=()=>{mode=b.dataset.v;document.querySelectorAll("#f-mode button").forEach(x=>x.classList.toggle("on",x===b));});
-  document.getElementById("saveIv").onclick=()=>{
+  document.getElementById("saveIv").onclick=async()=>{
     const obj={id:isEdit?it.id:uid(),company:val("f-company")||"未命名",position:val("f-position"),
       date:val("f-date"),time:val("f-time"),endTime:val("f-endtime")||"",mode,
       round:val("f-round")||"一面",status:val("f-status"),notes:val("f-notes")};
     if(isEdit){const idx=state.interviews.findIndex(x=>x.id===it.id);state.interviews[idx]=obj;}
     else state.interviews.push(obj);
-    apiSave("interview",obj);showToast("面試已儲存 ✓");closeSheet();renderAll();
+    closeSheet();renderAll();
+    await apiSave("interview",obj);
+    if(GAS_URL) showToast("面試已儲存 ✓");
   };
   if(isEdit)document.getElementById("delIv").onclick=()=>{state.interviews=state.interviews.filter(x=>x.id!==it.id);apiDelete("interview",it.id);closeSheet();renderAll();};
 }
@@ -519,12 +535,14 @@ function openOfferSheet(o){
   drawBonus();
   document.getElementById("addBonus").onclick=()=>{const v=val("o-bonus").trim();if(v){bonuses.push(v);document.getElementById("o-bonus").value="";drawBonus();}};
   document.getElementById("o-bonus").addEventListener("keydown",ev=>{if(ev.key==="Enter"){ev.preventDefault();document.getElementById("addBonus").click();}});
-  document.getElementById("saveOffer").onclick=()=>{
+  document.getElementById("saveOffer").onclick=async()=>{
     const obj={id:o?o.id:uid(),company:val("o-company")||"未命名",position:val("o-position"),
       month:+val("o-month")||0,year:+val("o-year")||0,location:val("o-location"),info:val("o-info"),
       ratings:{...ratings},bonuses:[...bonuses]};
     if(o){const i=state.offers.findIndex(x=>x.id===o.id);state.offers[i]=obj;}else state.offers.push(obj);
-    apiSave("offer",obj);showToast("OFFER 已儲存 ✓");closeSheet();renderAll();
+    closeSheet();renderAll();
+    await apiSave("offer",obj);
+    if(GAS_URL) showToast("OFFER 已儲存 ✓");
   };
   if(o)document.getElementById("delOffer").onclick=()=>{state.offers=state.offers.filter(x=>x.id!==o.id);apiDelete("offer",o.id);closeSheet();renderAll();};
 }
