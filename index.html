@@ -22,7 +22,7 @@ body{font-family:'Huninn',sans-serif;background:#f3d9df;color:var(--ink);display
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 input,textarea,select{font-family:inherit;font-size:16px}
 .app{width:100%;max-width:440px;background:var(--bg);height:100svh;display:flex;flex-direction:column;position:relative;overflow:hidden}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 16px 8px;flex:none}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 16px 8px;flex:none;position:sticky;top:0;z-index:10;background:var(--bg)}
 .brand{display:flex;align-items:center;gap:8px}
 .mascot{width:30px;height:30px;border-radius:50%;background:var(--pink-soft);display:flex;align-items:center;justify-content:center;flex:none}
 .face{position:relative;width:15px;height:11px}
@@ -131,7 +131,7 @@ input,textarea,select{font-family:inherit;font-size:16px}
 .iblock .it{font-size:9px;opacity:.9;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 /* quote */
 .quote-card{background:var(--pink-soft);border-radius:var(--r-lg);padding:16px 18px;margin-bottom:8px;border:0.5px solid var(--line)}
-.quote-text{font-size:15px;color:var(--ink2);line-height:1.75;text-align:center}
+.quote-text{font-size:15px;color:var(--ink2);line-height:1.75;text-align:center;text-wrap:balance;overflow-wrap:break-word}
 .toast{position:absolute;top:calc(56px + env(safe-area-inset-top));left:50%;transform:translateX(-50%) translateY(-4px);background:var(--ink2);color:#fff;padding:8px 20px;border-radius:999px;font-size:13px;z-index:60;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .detail-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--line2)}
@@ -181,7 +181,7 @@ input,textarea,select{font-family:inherit;font-size:16px}
 </div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxF-HlkTcaBo-3bN0AD-ZfiBoKxoPZQIgye9m-ReoEjt2Ol60FR8_ze5Qn3RHymIfEagA/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxF-HlkTcaBo-3bN0AD-ZfiBoKxoPZQIgye9m-ReoEjt2Ol60FR8_ze5Qn3RHymIfEagA/exec"; // ← 把你的 GAS /exec 網址貼在這裡
 const DIMENSIONS = ["月薪","年薪","上班地點","工作內容","公司福利與氣氛","工作時數"];
 const STATUSES = ["投遞中","已排面試","面試完成","等通知","收到Offer","已婉拒","未錄取"];
 const STATUS_STYLE = {
@@ -229,15 +229,15 @@ let state={
 };
 
 async function apiLoad(){
-  if(!GAS_URL){showToast("⚠️ 請先填入 GAS_URL");return;}
-  showToast("資料載入中…");
+  if(!GAS_URL)return;
+  showToast("載入中…");
   try{
-    const r=await fetch(GAS_URL+"?t="+Date.now());
+    const r=await fetch(GAS_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"get"})});
     const d=await r.json();
     if(d.interviews)state.interviews=d.interviews;
     if(d.offers)state.offers=d.offers;
-    renderAll();showToast("資料已同步 ✓");
-  }catch(e){showToast("❌ 載入失敗："+e.message);}
+    renderAll();showToast("已同步 ✓");
+  }catch(e){showToast("❌ 讀取失敗："+e.message);}
 }
 async function apiSave(type,data){
   if(!GAS_URL)return;
@@ -413,8 +413,16 @@ function renderMy(){
     +'<div class="stat"><div class="n">'+state.interviews.length+'</div><div class="l">面試場次</div></div>'
     +'<div class="stat"><div class="n">'+state.offers.length+'</div><div class="l">OFFER 數</div></div>'
     +'<div class="stat"><div class="n">'+ongoing+'</div><div class="l">進行中</div></div></div>'
-    +'<div class="sec-label" style="margin:36px 0 10px;text-align:center">今日金句 ♡</div>'
-    +'<div class="quote-card"><div class="quote-text">「'+QUOTES[QUOTE_IDX]+'」</div></div></div>';
+    +'<div class="sec-label" style="margin:28px 0 10px;text-align:center">今日金句 ♡</div>'
+    +'<div class="quote-card"><div class="quote-text">「'+QUOTES[QUOTE_IDX]+'」</div></div>'
+    +'<div style="margin-top:20px;display:flex;justify-content:center">'
+    +'<div style="background:var(--pink-soft);border-radius:22px;padding:8px;display:inline-block">'
+    +'<div style="background:#fff;border-radius:15px;padding:6px;overflow:hidden">'
+    +'<img src="https://img2.pixhost.to/images/8350/733716022_s__9936899.jpg" '
+    +'style="display:block;width:260px;max-width:100%;border-radius:11px;object-fit:cover" '
+    +'onerror="this.style.display=\'none\'">'
+    +'</div></div></div>'
+    +'</div>';
 }
 
 function openSheet(title,bodyHTML){
