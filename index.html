@@ -141,10 +141,26 @@ input,textarea,select{font-family:inherit;font-size:16px}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .detail-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--line2)}
 .detail-row:last-child{border-bottom:none}
+#splash{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:20px;animation:spIn .35s ease}
+@keyframes spIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+@keyframes spOut{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(1.04)}}
+#splash.hide{animation:spOut .55s ease forwards;pointer-events:none}
 </style>
 </head>
 <body>
 <div class="app">
+  <div id="splash">
+    <div style="background:var(--pink-soft);border-radius:26px;padding:9px">
+      <div style="background:#fff;border-radius:19px;overflow:hidden">
+        <img src="https://img2.pixhost.to/images/8350/733716022_s__9936899.jpg"
+             style="display:block;width:210px;max-height:270px;object-fit:cover"
+             onerror="this.style.display='none'">
+      </div>
+    </div>
+    <div style="font-family:'Huninn',sans-serif;font-size:26px;color:var(--ink2);letter-spacing:3px;margin-top:4px">面試大作戰</div>
+    <div style="font-size:13px;color:var(--muted)">陳太太加油 ♡</div>
+  </div>
+
   <div class="topbar">
     <div class="brand">
       <div class="mascot"><div class="face"><span class="eye l"></span><span class="eye r"></span><span class="sm"></span></div></div>
@@ -611,6 +627,7 @@ function renderAll(){renderWeekCalendar();renderInterviews();renderOffers();rend
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)apiLoad(true);});
 renderAll();
 apiLoad();
+setTimeout(()=>{const sp=document.getElementById('splash');if(sp){sp.classList.add('hide');setTimeout(()=>sp.remove(),560);}},2000);
 </script>
 </body>
 </html>
