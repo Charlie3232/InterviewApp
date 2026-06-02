@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>陳太太面試大作戰</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF1F4;--surface:#fff;--ink:#7a4a58;--ink2:#B14A6B;--muted:#c98ba0;
+  --pink:#FF8FAB;--pink-soft:#FFD1DC;--pink-bg:#FFE0E8;--gold:#FFB22E;
+  --peach-bg:#FFEDD6;--peach-ink:#B5701E;--line:#f3cdd6;--line2:#fbe2e8;
+  --mint-bg:#DDF3E9;--mint-ink:#2E8C6E;--lav-bg:#EAE2F8;--lav-ink:#6A57A8;
+  --grey-bg:#efe7ea;--grey-ink:#9a8b91;--red-bg:#FBE0E0;--red-ink:#C0656A;
+  --lunch:#FFF5ED;--morandi:#A8A29B;--r:18px;--r-lg:22px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{font-family:'Huninn',sans-serif;background:#f3d9df;color:var(--ink);display:flex;justify-content:center;min-height:100vh}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea,select{font-family:inherit;font-size:16px}
+.app{width:100%;max-width:440px;background:var(--bg);height:100svh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 16px 8px;flex:none}
+.brand{display:flex;align-items:center;gap:8px}
+.mascot{width:30px;height:30px;border-radius:50%;background:var(--pink-soft);display:flex;align-items:center;justify-content:center;flex:none}
+.face{position:relative;width:15px;height:11px}
+.face .eye{position:absolute;top:1px;width:3px;height:3px;border-radius:50%;background:#6b5a52}
+.face .l{left:1px}.face .r{right:1px}
+.face .sm{position:absolute;bottom:0;left:2px;width:11px;height:5px;border:1.5px solid #6b5a52;border-top:0;border-radius:0 0 10px 10px}
+.brand h1{font-size:16px;color:var(--ink2);margin:0;font-weight:400}
+/* pages */
+.page{display:none;flex:1;overflow-y:auto;padding:4px 0 90px;-webkit-overflow-scrolling:touch;min-height:0}
+.page.active{display:block}
+#page-cal{padding:0;overflow:hidden;padding-bottom:calc(62px + env(safe-area-inset-bottom))}
+#page-cal.active{display:flex;flex-direction:column}
+.sec-label{font-size:13px;color:var(--muted);margin:14px 16px 8px}
+.empty{text-align:center;color:var(--muted);font-size:14px;padding:38px 10px}
+.card{background:var(--surface);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:10px;border:0.5px solid var(--line2)}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.pill{font-size:11px;padding:3px 11px;border-radius:999px;white-space:nowrap;display:inline-block}
+.datebox{border-radius:14px;padding:6px 8px;text-align:center;flex:none;min-width:50px}
+.datebox .d{font-size:15px;line-height:1.15}
+.datebox .t{font-size:10px;opacity:.85}
+.title{font-size:14px;color:var(--ink);font-weight:400}
+.sub{font-size:11px;color:var(--muted);margin-top:2px}
+.stars .on{color:var(--gold)}.stars .off{color:#f0dde2}
+.star-input span{font-size:24px;color:#f0dde2;padding:0 1px}
+.star-input span.on{color:var(--gold)}
+.rankbadge{background:var(--pink);color:#fff;font-size:12px;padding:4px 11px;border-radius:999px}
+.kv{display:flex;gap:10px;flex-wrap:wrap;margin-top:7px}
+.kv div{font-size:12px;color:var(--ink)}
+.kv b{color:var(--ink2);font-weight:400}
+.chip{font-size:11px;padding:4px 10px;border-radius:999px;background:var(--peach-bg);color:var(--peach-ink);display:inline-block}
+.bargroup{margin-bottom:16px}
+.bargroup h4{font-size:13px;color:var(--ink2);margin:0 0 8px;font-weight:400}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.bar-name{font-size:11px;color:var(--ink);width:60px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{flex:1;background:#fbe9ee;border-radius:999px;height:16px;overflow:hidden}
+.bar-fill{height:100%;background:var(--pink);border-radius:999px;min-width:3px}
+.bar-fill.hl{background:var(--gold)}
+.bar-val{font-size:11px;color:var(--muted);width:62px;flex:none;text-align:right}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:6px 0 4px}
+.stat{background:var(--surface);border-radius:var(--r);padding:14px 6px;text-align:center;border:0.5px solid var(--line2)}
+.stat .n{font-size:22px;color:var(--ink2)}
+.stat .l{font-size:11px;color:var(--muted);margin-top:3px}
+.fab{position:absolute;right:16px;bottom:calc(80px + env(safe-area-inset-bottom));width:50px;height:50px;border-radius:50%;background:var(--pink);color:#fff;font-size:28px;display:none;align-items:center;justify-content:center;z-index:20}
+.fab.show{display:flex}
+.nav{position:absolute;left:0;right:0;bottom:0;background:var(--surface);display:flex;justify-content:space-around;padding:6px 4px calc(8px + env(safe-area-inset-bottom));border-top:0.5px solid var(--line2);z-index:15;flex:none}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--muted);padding:4px 10px;border-radius:14px}
+.nav button .ico{font-size:20px}
+.nav button.on{color:var(--ink2);background:var(--pink-soft)}
+.scrim{position:absolute;inset:0;background:rgba(122,74,88,.32);opacity:0;pointer-events:none;transition:opacity .25s;z-index:30}
+.scrim.show{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--bg);border-radius:26px 26px 0 0;transform:translateY(110%);transition:transform .3s cubic-bezier(.32,.72,0,1);z-index:31;max-height:92%;display:flex;flex-direction:column}
+.sheet.show{transform:translateY(0)}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 4px}
+.sheet-head h3{margin:0;font-size:17px;color:var(--ink2);font-weight:400}
+.sheet-head .x{font-size:22px;color:var(--muted)}
+.sheet-body{overflow-y:auto;padding:8px 18px calc(18px + env(safe-area-inset-bottom))}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+.field input,.field textarea,.field select{width:100%;border:0.5px solid var(--line);border-radius:13px;padding:10px 13px;background:#fff;color:var(--ink)}
+.field textarea{resize:none;min-height:56px}
+.two{display:flex;gap:10px}.two>.field{flex:1}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg button{border:0.5px solid var(--line);border-radius:999px;padding:6px 13px;font-size:13px;background:#fff;color:var(--ink)}
+.seg button.on{background:var(--pink);color:#fff;border-color:var(--pink)}
+.dimrow{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:0.5px dashed var(--line2)}
+.dimrow span{font-size:14px;color:var(--ink)}
+.bonus-add{display:flex;gap:8px}
+.bonus-add input{flex:1}
+.bonus-add button{background:var(--pink-bg);color:var(--ink2);border-radius:12px;padding:0 14px;font-size:14px}
+.bonus-list{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.bonus-list .chip i{margin-left:4px;font-style:normal;opacity:.6}
+.save-btn{width:100%;background:var(--pink);color:#fff;border-radius:15px;padding:13px;font-size:15px;margin-top:6px}
+.del-btn{width:100%;background:transparent;color:var(--red-ink);border-radius:15px;padding:11px;font-size:13px;margin-top:6px}
+/* modal */
+.modal-wrap{position:absolute;inset:0;background:rgba(122,74,88,.42);z-index:50;display:none;align-items:center;justify-content:center}
+.modal-wrap.show{display:flex}
+.modal-box{background:var(--bg);border-radius:24px;width:94%;max-height:86%;overflow-y:auto;padding:18px 16px 22px}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.modal-head span{font-size:16px;color:var(--ink2)}
+.modal-head button{font-size:22px;color:var(--muted)}
+/* ====== 週曆 — 彈性填滿螢幕 ====== */
+.wk-nav{flex:none;display:flex;flex-direction:column;padding:8px 12px 4px;gap:4px}
+.wk-m{font-size:13px;color:var(--ink2)}
+.wk-btn{width:28px;height:28px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--pink);border:0.5px solid var(--line2)}
+.wk-add{background:var(--pink);color:#fff;border-radius:999px;padding:5px 12px;font-size:12px}
+/* grid layout — flex, fills remaining height */
+.wk-grid{flex:1;display:flex;min-height:0;padding:0 10px}
+.wk-timecol{width:30px;flex:none;display:flex;flex-direction:column}
+.wk-th-spacer{height:36px;flex:none}
+.wk-tlabels{flex:1;display:flex;flex-direction:column;border-right:0.5px solid var(--line2)}
+.wk-tl{flex:1;display:flex;align-items:flex-start;justify-content:flex-end;padding:2px 3px 0 0;font-size:10px;color:var(--muted);line-height:1}
+.wk-tl.lunch{background:var(--lunch);align-items:center;justify-content:center;padding:0;font-size:9px;color:var(--peach-ink);border-top:1px solid var(--line)}
+.wk-days{flex:1;display:flex;min-width:0;overflow:hidden}
+.wk-col{flex:1;min-width:0;display:flex;flex-direction:column;border-right:0.5px solid var(--line2)}
+.wk-col:first-child{border-left:none}
+.wk-dh{height:36px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--muted);background:var(--surface);border-bottom:0.5px solid var(--line2)}
+.wk-dh.today{background:var(--pink-bg);color:var(--ink2)}
+.wk-body{flex:1;position:relative;display:flex;flex-direction:column;overflow:hidden}
+.wk-cell{flex:1;border-bottom:0.5px solid var(--line2)}
+.wk-cell.lunch{background:var(--lunch);border-top:1px solid var(--line)}
+.wk-cell.last{border-bottom:none}
+/* interview block */
+.iblock{position:absolute;left:2px;right:2px;border-radius:8px;background:var(--pink);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;z-index:5;padding:2px 3px;text-align:center}
+.iblock .ic{font-size:11px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.iblock .it{font-size:9px;opacity:.9;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+/* quote */
+.quote-card{background:var(--pink-soft);border-radius:var(--r-lg);padding:16px 18px;margin-bottom:8px;border:0.5px solid var(--line)}
+.quote-text{font-size:15px;color:var(--ink2);line-height:1.75;text-align:center}
+.toast{position:absolute;top:calc(56px + env(safe-area-inset-top));left:50%;transform:translateX(-50%) translateY(-4px);background:var(--ink2);color:#fff;padding:8px 20px;border-radius:999px;font-size:13px;z-index:60;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.detail-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--line2)}
+.detail-row:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="mascot"><div class="face"><span class="eye l"></span><span class="eye r"></span><span class="sm"></span></div></div>
+      <h1 id="pageTitle">陳太太面試大作戰</h1>
+      <span style="font-size:10px;color:#c4a8b8;white-space:nowrap;align-self:flex-end;margin-bottom:2px">Design by Charlie.</span>
+    </div>
+    <span style="font-size:18px;color:var(--pink)">♡</span>
+  </div>
+
+  <div class="page active" id="page-cal"></div>
+  <div class="page" id="page-interview"></div>
+  <div class="page" id="page-offer">
+    <div class="sec-label">OFFER 排名（前 5 名）</div>
+    <div id="offerList"></div>
+    <div id="offerFooter" style="padding:0 16px 8px"></div>
+  </div>
+  <div class="page" id="page-my"></div>
+
+  <button class="fab" id="fab">＋</button>
+
+  <div class="nav">
+    <button data-tab="cal" class="on"><span class="ico">📅</span>行事曆</button>
+    <button data-tab="interview"><span class="ico">📝</span>面試</button>
+    <button data-tab="offer"><span class="ico">🏆</span>OFFER</button>
+    <button data-tab="my"><span class="ico">🐾</span>我的</button>
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet" id="sheet">
+    <div class="sheet-head"><h3 id="sheetTitle"></h3><button class="x" id="sheetClose">✕</button></div>
+    <div class="sheet-body" id="sheetBody"></div>
+  </div>
+  <div class="modal-wrap" id="modal">
+    <div class="modal-box">
+      <div class="modal-head"><span>詳細比較圖表</span><button onclick="closeModal()">✕</button></div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwhFINcsEqsShct258untuwOjOMNt86welmDU8bETuQ5xZIyR_kaiRsDQHzHX8v6KOYbw/exec";
+const DIMENSIONS = ["月薪","年薪","上班地點","工作內容","公司福利與氣氛","工作時數"];
+const STATUSES = ["投遞中","已排面試","面試完成","等通知","收到Offer","已婉拒","未錄取"];
+const STATUS_STYLE = {
+  "投遞中":["var(--grey-bg)","var(--grey-ink)"],"已排面試":["var(--pink-bg)","var(--ink2)"],
+  "面試完成":["var(--lav-bg)","var(--lav-ink)"],"等通知":["var(--peach-bg)","var(--peach-ink)"],
+  "收到Offer":["var(--mint-bg)","var(--mint-ink)"],"已婉拒":["var(--grey-bg)","var(--grey-ink)"],
+  "未錄取":["var(--red-bg)","var(--red-ink)"]
+};
+const H_START=8, H_END=20, H_LUNCH=12, H_COUNT=H_END-H_START;
+const HOURS=[
+  {h:8,flex:1},{h:9,flex:1},{h:10,flex:1},{h:11,flex:1},
+  {h:12,flex:1,lunch:true},
+  {h:13,flex:1},{h:14,flex:1},{h:15,flex:1},{h:16,flex:1},{h:17,flex:1},{h:18,flex:1},{h:19,flex:1}
+];
+
+const QUOTES=[
+  "每一次面試，都是認識更好自己的機會。",
+  "被拒絕不是終點，是找到更適合你的路的開始。",
+  "你的能力不會因為沒被錄取而減少一分。",
+  "準備好了，機會才能被你接住。",
+  "有時候 No offer，是命運在幫你保留更好的位置。",
+  "你值得一份讓你週一早上也期待的工作。",
+  "每個大公司的員工，也曾被其他公司拒絕過。",
+  "不是你不夠好，只是時機還沒到。",
+  "面試失利是資料收集，不是自我否定。",
+  "維持體力、作息正常，是求職期間最重要的事。",
+  "知道自己要什麼，比什麼都更重要。",
+  "你的故事還沒結束，最好的章節在後面。",
+  "把每一次面試當練習，而不是生死關。",
+  "好的工作，在等一個準備好的你。",
+  "休息不是放棄，是為了走得更遠。",
+  "你有能力撐過這段時期，過去的你也撐過了許多難關。",
+  "不用和別人比進度，每個人的時間表都不一樣。",
+  "找到理想工作的路上，辛苦的都算數。",
+  "今天的努力，是明天更多選擇的底氣。",
+  "工作只是生活的一部分，不是全部的定義。"
+];
+const QUOTE_IDX=Math.floor(Math.random()*QUOTES.length);
+
+let state={
+  interviews:[
+    {id:"i1",company:"台積電",position:"製程整合工程師",date:isoOffset(3),time:"14:00",endTime:"15:30",mode:"線上",round:"二面",status:"已排面試",notes:"準備製程良率題"},
+    {id:"i2",company:"聯發科",position:"數位IC設計",date:isoOffset(7),time:"10:30",endTime:"12:00",mode:"實體",round:"一面",status:"等通知",notes:""},
+    {id:"i3",company:"鴻海",position:"韌體工程師",date:isoOffset(-2),time:"15:00",endTime:"16:00",mode:"線上",round:"HR面",status:"面試完成",notes:"談薪資範圍 4.5~5 萬"},
+    {id:"i4",company:"台積電",position:"初面測驗",date:isoToday(),time:"09:30",endTime:"10:30",mode:"線上",round:"一面",status:"已排面試",notes:""},
+  ],
+  offers:[
+    {id:"o1",company:"聯發科",position:"數位IC設計",month:62000,year:1100000,location:"新竹",info:"分紅另計，年保證14個月",ratings:{"月薪":5,"年薪":5,"上班地點":4,"工作內容":5,"公司福利與氣氛":4,"工作時數":3},bonuses:["股票","遠端1天"]},
+    {id:"o2",company:"台達電",position:"電源工程師",month:55000,year:880000,location:"桃園",info:"三節獎金優",ratings:{"月薪":4,"年薪":4,"上班地點":3,"工作內容":4,"公司福利與氣氛":4,"工作時數":4},bonuses:["彈性上下班"]},
+  ],
+  weekStart:getWeekStart(new Date()),
+  tab:"cal"
+};
+
+async function apiLoad(){if(!GAS_URL)return;showToast("資料載入中…");try{const r=await fetch(GAS_URL);const d=await r.json();if(d.interviews)state.interviews=d.interviews;if(d.offers)state.offers=d.offers;renderAll();showToast("資料已同步 ✓");}catch(e){showToast("載入失敗，使用本機資料");}}
+async function apiSave(type,data){if(!GAS_URL)return;try{await fetch(GAS_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"save",type,data})});}catch(e){}}
+async function apiDelete(type,id){if(!GAS_URL)return;try{await fetch(GAS_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"delete",type,id})});}catch(e){}}
+
+function isoToday(){return isoOffset(0);}
+function isoOffset(days){const d=new Date();d.setDate(d.getDate()+days);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function toISO(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function getWeekStart(d){const dt=new Date(d);const day=dt.getDay();dt.setDate(dt.getDate()+(day===0?-6:1-day));dt.setHours(0,0,0,0);return dt;}
+function uid(){return "x"+Date.now().toString(36)+Math.floor(Math.random()*1000);}
+function nf(n){return Number(n||0).toLocaleString("en-US");}
+function offerScore(o){let s=0;DIMENSIONS.forEach(d=>s+=(o.ratings[d]||0));return s+(o.bonuses?o.bonuses.length:0)*2;}
+function statusPill(s){const c=STATUS_STYLE[s]||["var(--grey-bg)","var(--grey-ink)"];return '<span class="pill" style="background:'+c[0]+';color:'+c[1]+'">'+s+'</span>';}
+function fmtDate(iso){const p=iso.split("-");return p[1]+"/"+p[2];}
+function timeToMin(t){const[h,m]=(t||"0:0").split(":");return +h*60+(+m||0);}
+
+const TITLES={cal:"陳太太面試大作戰",interview:"面試清單",offer:"OFFER 排名",my:"我的"};
+function switchTab(t){
+  state.tab=t;
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById("page-"+t).classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));
+  document.getElementById("pageTitle").textContent=TITLES[t];
+  document.getElementById("fab").classList.toggle("show",t==="interview"||t==="offer");
+}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+document.getElementById("fab").onclick=()=>{if(state.tab==="interview")openInterviewSheet();else openOfferSheet();};
+
+function prevWeek(){state.weekStart.setDate(state.weekStart.getDate()-7);renderWeekCalendar();}
+function nextWeek(){state.weekStart.setDate(state.weekStart.getDate()+7);renderWeekCalendar();}
+
+function renderWeekCalendar(){
+  const ws=state.weekStart,today=isoToday();
+  const days=[];
+  for(let i=0;i<5;i++){const d=new Date(ws);d.setDate(d.getDate()+i);days.push({iso:toISO(d),lbl:["一","二","三","四","五"][i]});}
+  const range=fmtDate(days[0].iso)+" — "+fmtDate(days[4].iso);
+  let html='<div class="wk-nav">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between">'
+    +'<div style="display:flex;align-items:center;gap:4px">'
+    +'<button class="wk-btn" onclick="prevWeek()">‹</button>'
+    +'<span class="wk-m">'+range+'</span>'
+    +'<button class="wk-btn" onclick="nextWeek()">›</button></div>'
+    +'<button class="wk-add" onclick="openInterviewSheet()">＋ 新增</button></div>'
+    +'<div style="display:flex;gap:10px">'
+    +'<span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--muted)"><span style="width:8px;height:8px;border-radius:50%;background:var(--morandi);flex:none;display:inline-block"></span>線上</span>'
+    +'<span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--muted)"><span style="width:8px;height:8px;border-radius:50%;background:var(--pink);flex:none;display:inline-block"></span>實體</span>'
+    +'</div></div>';
+
+  html+='<div class="wk-grid">';
+  html+='<div class="wk-timecol"><div class="wk-th-spacer"></div><div class="wk-tlabels">';
+  HOURS.forEach((hh)=>{
+    if(hh.lunch) html+='<div class="wk-tl lunch" style="flex:'+hh.flex+'">午</div>';
+    else html+='<div class="wk-tl" style="flex:'+hh.flex+'">'+hh.h+'</div>';
+  });
+  html+='</div></div>';
+
+  // day cols
+  html+='<div class="wk-days">';
+  days.forEach(day=>{
+    const dayIvs=state.interviews.filter(i=>i.date===day.iso);
+    html+='<div class="wk-col"><div class="wk-dh'+(day.iso===today?' today':'')+'">'
+      +day.lbl+'<br><span style="font-size:9px">'+fmtDate(day.iso)+'</span></div>'
+      +'<div class="wk-body" data-iso="'+day.iso+'">';
+    HOURS.forEach((hh,i)=>{
+      html+='<div class="wk-cell'+(hh.lunch?' lunch':'')+(i===HOURS.length-1?' last':'')+'" '
+        +'style="flex:'+hh.flex+'" '
+        +'data-time="'+String(hh.h).padStart(2,'0')+':00" data-iso="'+day.iso+'"></div>';
+    });
+    dayIvs.forEach(iv=>{
+      const sM=timeToMin(iv.time),eM=iv.endTime?timeToMin(iv.endTime):sM+60;
+      const topP=((sM-H_START*60)/(H_COUNT*60)*100).toFixed(2);
+      const htP=((eM-sM)/(H_COUNT*60)*100).toFixed(2);
+      const bg=iv.mode==='線上'?'var(--morandi)':'var(--pink)';
+      html+='<div class="iblock" data-id="'+iv.id+'" '
+        +'style="top:'+topP+'%;height:max('+htP+'%,28px);background:'+bg+'">'
+        +'<div class="ic">'+iv.company+'</div>'
+        +'<div class="it">'+iv.time+(iv.endTime?' – '+iv.endTime:'')+'</div></div>';
+    });
+    html+='</div></div>';
+  });
+  html+='</div></div>';
+
+  const page=document.getElementById("page-cal");
+  page.innerHTML=html;
+  page.querySelectorAll(".wk-cell").forEach(c=>c.onclick=e=>openInterviewSheet({date:c.dataset.iso,time:c.dataset.time}));
+  page.querySelectorAll(".iblock").forEach(b=>b.onclick=e=>{e.stopPropagation();const iv=state.interviews.find(x=>x.id===b.dataset.id);if(iv)openInterviewDetail(iv);});
+}
+
+function interviewCard(i){
+  const c=STATUS_STYLE[i.status]||["var(--pink-bg)","var(--ink2)"];
+  const tStr=i.time+(i.endTime?' – '+i.endTime:'');
+  return '<div class="card interview-card" data-id="'+i.id+'" style="margin:0 16px 10px">'
+    +'<div class="row between">'
+    +'<div class="datebox" style="background:'+c[0]+';color:'+c[1]+'"><div class="d">'+fmtDate(i.date)+'</div><div class="t">'+tStr+'</div></div>'
+    +'<div style="flex:1"><div class="title">'+i.company+' · '+i.position+'</div>'
+    +'<div class="sub">'+i.round+' · '+i.mode+(i.notes?' · '+i.notes:'')+'</div></div>'
+    +statusPill(i.status)+'</div></div>';
+}
+function bindICards(scope){scope.querySelectorAll(".interview-card").forEach(c=>c.onclick=()=>{const it=state.interviews.find(x=>x.id===c.dataset.id);if(it)openInterviewDetail(it);});}
+function renderInterviews(){
+  const page=document.getElementById("page-interview");
+  const today=isoToday();
+  const sorted=[...state.interviews].sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  const g={"今天":[],"即將":[],"已過":[]};
+  sorted.forEach(i=>{if(i.date===today)g["今天"].push(i);else if(i.date>today)g["即將"].push(i);else g["已過"].push(i);});
+  let html="";if(!sorted.length)html='<div class="empty">還沒有面試，點右下角＋新增 ♡</div>';
+  ["今天","即將","已過"].forEach(k=>{if(g[k].length)html+='<div class="sec-label">'+k+'</div>'+g[k].map(interviewCard).join("");});
+  page.innerHTML=html;bindICards(page);
+}
+
+function renderOffers(){
+  const box=document.getElementById("offerList"),footer=document.getElementById("offerFooter");
+  const sorted=[...state.offers].sort((a,b)=>offerScore(b)-offerScore(a));
+  if(!sorted.length){box.innerHTML='<div class="empty">還沒有 OFFER，點右下角＋新增 ♡</div>';footer.innerHTML='';return;}
+  const top5=sorted.slice(0,5);
+  box.innerHTML=top5.map((o,idx)=>'<div class="card offer-card" data-id="'+o.id+'" style="margin:0 16px 10px;cursor:pointer">'
+    +'<div class="row between" style="flex-wrap:wrap;gap:7px">'
+    +'<div class="row" style="gap:8px"><span class="rankbadge">♥ #'+(idx+1)+'</span>'
+    +'<span style="font-size:15px;color:var(--ink2)">'+o.company+'</span></div>'
+    +'<span style="font-size:12px;color:var(--gold)">★ '+offerScore(o)+'</span></div>'
+    +'<div style="font-size:12px;color:var(--muted);margin-top:3px">'+o.position+'</div>'
+    +'<div class="kv"><div>月薪 <b>$'+nf(o.month)+'</b></div><div>年薪 <b>$'+nf(o.year)+'</b></div><div>地點 <b>'+(o.location||'—')+'</b></div></div>'
+    +(o.bonuses&&o.bonuses.length?'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">'+o.bonuses.map(b=>'<span class="chip">+'+b+'</span>').join('')+'</div>':'')
+    +'</div>').join("");
+  box.querySelectorAll(".offer-card").forEach(c=>c.onclick=()=>{const o=state.offers.find(x=>x.id===c.dataset.id);if(o)openOfferDetail(o);});
+  footer.innerHTML=(sorted.length>5?'<p style="font-size:12px;color:var(--muted);text-align:center;margin:0 0 10px">+ '+(sorted.length-5)+' 個 OFFER 未顯示</p>':'')
+    +(sorted.length>=2?'<button onclick="openOfferModal()" style="width:100%;background:var(--pink);color:#fff;border-radius:15px;padding:13px;font-size:15px">查看詳細比較圖表</button>':'');
+}
+
+function openOfferModal(){
+  const sorted=[...state.offers].sort((a,b)=>offerScore(b)-offerScore(a)),top=sorted[0].id;
+  let html='<div class="sec-label" style="margin:0 0 8px">全部 OFFER 排名</div>';
+  sorted.forEach((o,i)=>html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--line2)">'
+    +'<div class="row" style="gap:8px"><span class="rankbadge" style="font-size:11px;padding:3px 9px">♥ #'+(i+1)+'</span>'
+    +'<span style="font-size:13px;color:var(--ink2)">'+o.company+'</span></div>'
+    +'<span style="font-size:12px;color:var(--muted)">$'+nf(o.month)+'／月 · '+offerScore(o)+'★</span></div>');
+  html+='<div class="sec-label" style="margin:14px 0 8px">各項目比較</div>';
+  html+=barGroup("月薪（元）",top,state.offers.map(x=>({name:x.company,val:x.month})),v=>"$"+nf(v));
+  html+=barGroup("年薪（元）",top,state.offers.map(x=>({name:x.company,val:x.year})),v=>"$"+nf(v));
+  html+=barGroup("總分（★）",top,state.offers.map(x=>({name:x.company,val:offerScore(x)})),v=>v+"★");
+  ["上班地點","工作內容","公司福利與氣氛","工作時數"].forEach(dim=>html+=barGroup(dim+"（★）",top,state.offers.map(x=>({name:x.company,val:x.ratings[dim]||0})),v=>v+"★",5));
+  document.getElementById("modal-body").innerHTML=html;
+  document.getElementById("modal").classList.add("show");
+}
+function closeModal(){document.getElementById("modal").classList.remove("show");}
+document.getElementById("modal").onclick=e=>{if(e.target===document.getElementById("modal"))closeModal();};
+
+function barGroup(title,hlId,items,fmt,fixedMax){
+  const max=fixedMax||Math.max(1,...items.map(i=>i.val));
+  const ordered=[...items].map((i,idx)=>({...i,_id:state.offers[idx].id})).sort((a,b)=>b.val-a.val);
+  return '<div class="bargroup"><h4>'+title+'</h4>'
+    +ordered.map(i=>{const w=Math.round((i.val/max)*100);
+      return '<div class="bar-row"><div class="bar-name">'+i.name+'</div>'
+        +'<div class="bar-track"><div class="bar-fill'+(i._id===hlId?' hl':'')+'" style="width:'+w+'%"></div></div>'
+        +'<div class="bar-val">'+fmt(i.val)+'</div></div>';}).join("")+'</div>';
+}
+
+function renderMy(){
+  const ongoing=state.interviews.filter(i=>["投遞中","已排面試","等通知"].includes(i.status)).length;
+  document.getElementById("page-my").innerHTML='<div style="padding:0 16px">'
+    +'<div class="statgrid">'
+    +'<div class="stat"><div class="n">'+state.interviews.length+'</div><div class="l">面試場次</div></div>'
+    +'<div class="stat"><div class="n">'+state.offers.length+'</div><div class="l">OFFER 數</div></div>'
+    +'<div class="stat"><div class="n">'+ongoing+'</div><div class="l">進行中</div></div></div>'
+    +'<div class="sec-label" style="margin:36px 0 10px;text-align:center">今日金句 ♡</div>'
+    +'<div class="quote-card"><div class="quote-text">「'+QUOTES[QUOTE_IDX]+'」</div></div></div>';
+}
+
+function openSheet(title,bodyHTML){
+  document.getElementById("sheetTitle").textContent=title;
+  document.getElementById("sheetBody").innerHTML=bodyHTML;
+  document.getElementById("scrim").classList.add("show");
+  document.getElementById("sheet").classList.add("show");
+}
+function closeSheet(){document.getElementById("scrim").classList.remove("show");document.getElementById("sheet").classList.remove("show");}
+document.getElementById("scrim").onclick=closeSheet;
+document.getElementById("sheetClose").onclick=closeSheet;
+
+function openInterviewDetail(iv){
+  const tStr=iv.time+(iv.endTime?' – '+iv.endTime:'');
+  const modeBg=iv.mode==='線上'?'var(--morandi)':'var(--pink)';
+  const html=
+    '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:18px">'
+    +'<div style="background:var(--pink-bg);border-radius:14px;padding:10px 12px;text-align:center;flex:none;min-width:60px">'
+    +'<div style="font-size:16px;color:var(--ink2)">'+fmtDate(iv.date)+'</div>'
+    +'<div style="font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap">'+tStr+'</div>'
+    +'</div>'
+    +'<div style="flex:1">'
+    +'<div style="font-size:18px;color:var(--ink2)">'+iv.company+'</div>'
+    +'<div style="font-size:13px;color:var(--muted);margin-top:3px">'+iv.position+'</div>'
+    +'</div></div>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">'
+    +'<span class="pill" style="background:'+modeBg+';color:#fff">'+iv.mode+'</span>'
+    +statusPill(iv.status)
+    +'<span class="pill" style="background:var(--grey-bg);color:var(--grey-ink)">'+iv.round+'</span>'
+    +'</div>'
+    +(iv.notes?'<div style="background:var(--surface);border-radius:13px;padding:12px 14px;font-size:13px;color:var(--ink);border:0.5px solid var(--line2);line-height:1.6;margin-bottom:4px">'+iv.notes+'</div>':'')
+    +'<div style="display:flex;gap:10px;margin-top:20px">'
+    +'<button onclick="closeSheet()" style="flex:1;border:0.5px solid var(--line);border-radius:15px;padding:12px;font-size:14px;color:var(--muted);background:var(--surface)">退出</button>'
+    +'<button id="toEdit" style="flex:2;background:var(--pink);color:#fff;border-radius:15px;padding:12px;font-size:14px">編輯</button>'
+    +'</div>';
+  openSheet(iv.company+' · '+iv.round,html);
+  document.getElementById('toEdit').onclick=()=>openInterviewSheet(iv);
+}
+
+function openInterviewSheet(it){
+  const isEdit=!!(it&&it.id);
+  const e=isEdit?it:{company:"",position:"",date:(it&&it.date)||isoToday(),time:(it&&it.time)||"10:00",endTime:"",mode:"線上",round:"一面",status:"已排面試",notes:""};
+  const html='<div class="field"><label>公司</label><input id="f-company" value="'+e.company+'" placeholder="例如 台積電"></div>'
+    +'<div class="field"><label>職位</label><input id="f-position" value="'+e.position+'" placeholder="例如 製程工程師"></div>'
+    +'<div class="two"><div class="field"><label>日期</label><input type="date" id="f-date" value="'+e.date+'"></div>'
+    +'<div class="field"><label>開始時間</label><input type="time" id="f-time" value="'+e.time+'"></div></div>'
+    +'<div class="field"><label>結束時間（選填）</label><input type="time" id="f-endtime" value="'+(e.endTime||'')+'"></div>'
+    +'<div class="field"><label>面試方式</label><div class="seg" id="f-mode">'
+    +["線上","實體"].map(m=>'<button class="'+(m===e.mode?'on':'')+'" data-v="'+m+'">'+m+'</button>').join("")+'</div></div>'
+    +'<div class="field"><label>輪次</label><input id="f-round" value="'+e.round+'" placeholder="一面 / 二面 / HR面"></div>'
+    +'<div class="field"><label>狀態</label><select id="f-status">'+STATUSES.map(s=>'<option '+(s===e.status?'selected':'')+'>'+s+'</option>').join("")+'</select></div>'
+    +'<div class="field"><label>備註</label><textarea id="f-notes" placeholder="想記的提醒…">'+e.notes+'</textarea></div>'
+    +'<button class="save-btn" id="saveIv">儲存</button>'
+    +(isEdit?'<button class="del-btn" id="delIv">刪除這場面試</button>':'');
+  openSheet(isEdit?"編輯面試":"新增面試",html);
+  let mode=e.mode;
+  document.querySelectorAll("#f-mode button").forEach(b=>b.onclick=()=>{mode=b.dataset.v;document.querySelectorAll("#f-mode button").forEach(x=>x.classList.toggle("on",x===b));});
+  document.getElementById("saveIv").onclick=()=>{
+    const obj={id:isEdit?it.id:uid(),company:val("f-company")||"未命名",position:val("f-position"),
+      date:val("f-date"),time:val("f-time"),endTime:val("f-endtime")||"",mode,
+      round:val("f-round")||"一面",status:val("f-status"),notes:val("f-notes")};
+    if(isEdit){const idx=state.interviews.findIndex(x=>x.id===it.id);state.interviews[idx]=obj;}
+    else state.interviews.push(obj);
+    apiSave("interview",obj);showToast("面試已儲存 ✓");closeSheet();renderAll();
+  };
+  if(isEdit)document.getElementById("delIv").onclick=()=>{state.interviews=state.interviews.filter(x=>x.id!==it.id);apiDelete("interview",it.id);closeSheet();renderAll();};
+}
+
+function openOfferDetail(o){
+  const sorted=[...state.offers].sort((a,b)=>offerScore(b)-offerScore(a));
+  const rank=sorted.findIndex(x=>x.id===o.id)+1;
+  const stars=n=>[1,2,3,4,5].map(i=>'<span style="color:'+(i<=n?'var(--gold)':'#f0dde2')+'">★</span>').join('');
+  const ratingRows=DIMENSIONS.map(d=>'<div class="detail-row"><span style="font-size:13px;color:var(--ink)">'+d+'</span><span>'+stars(o.ratings[d]||0)+'</span></div>').join('');
+  const html=
+    '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">'
+    +'<div><div style="font-size:18px;color:var(--ink2)">'+o.company+'</div>'
+    +'<div style="font-size:13px;color:var(--muted);margin-top:2px">'+o.position+'</div></div>'
+    +'<span class="rankbadge">♥ #'+rank+' · '+offerScore(o)+'★</span></div>'
+    +'<div class="kv" style="margin-bottom:14px">'
+    +'<div>月薪 <b>$'+nf(o.month)+'</b></div><div>年薪 <b>$'+nf(o.year)+'</b></div><div>地點 <b>'+(o.location||'—')+'</b></div></div>'
+    +(o.info?'<div style="background:var(--surface);border-radius:13px;padding:11px 14px;font-size:13px;color:var(--ink);border:0.5px solid var(--line2);margin-bottom:14px;line-height:1.6">'+o.info+'</div>':'')
+    +'<div style="margin-bottom:12px">'+ratingRows+'</div>'
+    +(o.bonuses&&o.bonuses.length?'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px">'+o.bonuses.map(b=>'<span class="chip">+'+b+'</span>').join('')+'</div>':'')
+    +'<div style="display:flex;gap:10px;margin-top:20px">'
+    +'<button onclick="closeSheet()" style="flex:1;border:0.5px solid var(--line);border-radius:15px;padding:12px;font-size:14px;color:var(--muted);background:var(--surface)">退出</button>'
+    +'<button id="toEditOffer" style="flex:2;background:var(--pink);color:#fff;border-radius:15px;padding:12px;font-size:14px">編輯</button>'
+    +'</div>';
+  openSheet(o.company+' · '+o.position,html);
+  document.getElementById('toEditOffer').onclick=()=>openOfferSheet(o);
+}
+
+function openOfferSheet(o){
+  const e=o||{company:"",position:"",month:"",year:"",location:"",info:"",
+    ratings:{"月薪":0,"年薪":0,"上班地點":0,"工作內容":0,"公司福利與氣氛":0,"工作時數":0},bonuses:[]};
+  let ratings={...e.ratings},bonuses=[...(e.bonuses||[])];
+  const dimRows=DIMENSIONS.map(d=>'<div class="dimrow"><span>'+d+'</span><div class="star-input" data-dim="'+d+'">'
+    +[1,2,3,4,5].map(i=>'<span data-v="'+i+'" class="'+(i<=(ratings[d]||0)?'on':'')+'">★</span>').join("")+'</div></div>').join("");
+  const html='<div class="field"><label>公司</label><input id="o-company" value="'+e.company+'" placeholder="例如 聯發科"></div>'
+    +'<div class="field"><label>職位</label><input id="o-position" value="'+e.position+'" placeholder="例如 數位IC設計"></div>'
+    +'<div class="two"><div class="field"><label>月薪</label><input type="number" inputmode="numeric" id="o-month" value="'+e.month+'" placeholder="62000"></div>'
+    +'<div class="field"><label>年薪</label><input type="number" inputmode="numeric" id="o-year" value="'+e.year+'" placeholder="1100000"></div></div>'
+    +'<div class="field"><label>工作地點</label><input id="o-location" value="'+e.location+'" placeholder="例如 新竹"></div>'
+    +'<div class="field"><label>資訊／備註</label><textarea id="o-info" placeholder="獎金、保證月數、福利…">'+e.info+'</textarea></div>'
+    +'<div class="sec-label" style="margin:4px 0 4px">各項評分（每項 5 星）</div>'+dimRows
+    +'<div class="field" style="margin-top:14px"><label>加分項（每項 +2★）</label>'
+    +'<div class="bonus-add"><input id="o-bonus" placeholder="例如 股票、遠端"><button id="addBonus">加入</button></div>'
+    +'<div class="bonus-list" id="bonusList"></div></div>'
+    +'<button class="save-btn" id="saveOffer">儲存</button>'
+    +(o?'<button class="del-btn" id="delOffer">刪除這個 OFFER</button>':'');
+  openSheet(o?"編輯 OFFER":"新增 OFFER",html);
+  document.querySelectorAll(".star-input").forEach(si=>{const dim=si.dataset.dim;
+    si.querySelectorAll("span").forEach(s=>s.onclick=()=>{let v=+s.dataset.v;if(ratings[dim]===v)v=v-1;ratings[dim]=v;
+      si.querySelectorAll("span").forEach(x=>x.classList.toggle("on",+x.dataset.v<=v));});});
+  function drawBonus(){document.getElementById("bonusList").innerHTML=bonuses.map((b,i)=>'<span class="chip" data-i="'+i+'">+'+b+' <i>✕</i></span>').join("");
+    document.querySelectorAll("#bonusList .chip").forEach(c=>c.onclick=()=>{bonuses.splice(+c.dataset.i,1);drawBonus();});}
+  drawBonus();
+  document.getElementById("addBonus").onclick=()=>{const v=val("o-bonus").trim();if(v){bonuses.push(v);document.getElementById("o-bonus").value="";drawBonus();}};
+  document.getElementById("o-bonus").addEventListener("keydown",ev=>{if(ev.key==="Enter"){ev.preventDefault();document.getElementById("addBonus").click();}});
+  document.getElementById("saveOffer").onclick=()=>{
+    const obj={id:o?o.id:uid(),company:val("o-company")||"未命名",position:val("o-position"),
+      month:+val("o-month")||0,year:+val("o-year")||0,location:val("o-location"),info:val("o-info"),
+      ratings:{...ratings},bonuses:[...bonuses]};
+    if(o){const i=state.offers.findIndex(x=>x.id===o.id);state.offers[i]=obj;}else state.offers.push(obj);
+    apiSave("offer",obj);showToast("OFFER 已儲存 ✓");closeSheet();renderAll();
+  };
+  if(o)document.getElementById("delOffer").onclick=()=>{state.offers=state.offers.filter(x=>x.id!==o.id);apiDelete("offer",o.id);closeSheet();renderAll();};
+}
+
+function showToast(msg){
+  let t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';document.querySelector('.app').appendChild(t);}
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+function val(id){const el=document.getElementById(id);return el?el.value:"";}
+function renderAll(){renderWeekCalendar();renderInterviews();renderOffers();renderMy();}
+renderAll();
+apiLoad();
+</script>
+</body>
+</html>
