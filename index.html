@@ -181,7 +181,7 @@ input,textarea,select{font-family:inherit;font-size:16px}
 </div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxF-HlkTcaBo-3bN0AD-ZfiBoKxoPZQIgye9m-ReoEjt2Ol60FR8_ze5Qn3RHymIfEagA/exec"; // ← 把你的 GAS /exec 網址貼在這裡
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzIcvArJ0DT2espx0RO8qZz5eM1qyyKdYMdNtR_OafvM2YA_YKqQIDgTYhGh_wVnSou9g/exec"; // ← 把你的 GAS /exec 網址貼在這裡
 const DIMENSIONS = ["月薪","年薪","上班地點","工作內容","公司福利與氣氛","工作時數"];
 const STATUSES = ["投遞中","已排面試","面試完成","等通知","收到Offer","已婉拒","未錄取"];
 const STATUS_STYLE = {
@@ -228,16 +228,18 @@ let state={
   tab:"cal"
 };
 
-async function apiLoad(){
+async function apiLoad(silent=false){
   if(!GAS_URL)return;
-  showToast("載入中…");
+  if(!silent)showToast("載入中…");
   try{
-    const r=await fetch(GAS_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"get"})});
-    const d=await r.json();
+    const r=await fetch(GAS_URL+"?v="+Date.now(),{cache:"no-store"});
+    const text=await r.text();
+    const d=JSON.parse(text);
     if(d.interviews)state.interviews=d.interviews;
     if(d.offers)state.offers=d.offers;
-    renderAll();showToast("已同步 ✓");
-  }catch(e){showToast("❌ 讀取失敗："+e.message);}
+    renderAll();
+    if(!silent)showToast("已同步 ✓");
+  }catch(e){if(!silent)showToast("❌ 讀取失敗："+e.message);}
 }
 async function apiSave(type,data){
   if(!GAS_URL)return;
@@ -488,9 +490,15 @@ function openInterviewSheet(it){
     else state.interviews.push(obj);
     closeSheet();renderAll();
     await apiSave("interview",obj);
-    if(GAS_URL) showToast("面試已儲存 ✓");
+    await apiLoad(true);
+    if(GAS_URL)showToast("面試已儲存 ✓");
   };
-  if(isEdit)document.getElementById("delIv").onclick=()=>{state.interviews=state.interviews.filter(x=>x.id!==it.id);apiDelete("interview",it.id);closeSheet();renderAll();};
+  if(isEdit)document.getElementById("delIv").onclick=async()=>{
+    state.interviews=state.interviews.filter(x=>x.id!==it.id);
+    closeSheet();renderAll();
+    await apiDelete("interview",it.id);
+    await apiLoad(true);
+  };
 }
 
 function openOfferDetail(o){
@@ -550,9 +558,15 @@ function openOfferSheet(o){
     if(o){const i=state.offers.findIndex(x=>x.id===o.id);state.offers[i]=obj;}else state.offers.push(obj);
     closeSheet();renderAll();
     await apiSave("offer",obj);
-    if(GAS_URL) showToast("OFFER 已儲存 ✓");
+    await apiLoad(true);
+    if(GAS_URL)showToast("OFFER 已儲存 ✓");
   };
-  if(o)document.getElementById("delOffer").onclick=()=>{state.offers=state.offers.filter(x=>x.id!==o.id);apiDelete("offer",o.id);closeSheet();renderAll();};
+  if(o)document.getElementById("delOffer").onclick=async()=>{
+    state.offers=state.offers.filter(x=>x.id!==o.id);
+    closeSheet();renderAll();
+    await apiDelete("offer",o.id);
+    await apiLoad(true);
+  };
 }
 
 function showToast(msg){
@@ -563,6 +577,7 @@ function showToast(msg){
 }
 function val(id){const el=document.getElementById(id);return el?el.value:"";}
 function renderAll(){renderWeekCalendar();renderInterviews();renderOffers();renderMy();}
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden)apiLoad(true); });
 renderAll();
 apiLoad();
 </script>
