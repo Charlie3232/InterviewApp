@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="面試大作戰">
 <meta name="theme-color" content="#FFF1F4">
-<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj4KPHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNGRkYxRjQiLz4KPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI3MiIgZmlsbD0iI0ZGOEZBQiIvPgo8Y2lyY2xlIGN4PSI4MiIgY3k9Ijg4IiByPSI3IiBmaWxsPSJ3aGl0ZSIvPgo8Y2lyY2xlIGN4PSIxMTgiIGN5PSI4OCIgcj0iNyIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTSA3NiAxMTMgUSAxMDAgMTM2IDEyNCAxMTMiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjx0ZXh0IHg9IjEzMiIgeT0iNjIiIGZvbnQtc2l6ZT0iMjgiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0ic2VyaWYiPuKZoTwvdGV4dD4KPC9zdmc+">
+<link rel="apple-touch-icon" href="icon.png">
 <title>陳太太面試大作戰</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,8 +26,8 @@ html,body{margin:0;padding:0;height:100%}
 body{font-family:'Huninn',sans-serif;background:#f3d9df;color:var(--ink);display:flex;justify-content:center;min-height:100vh}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 input,textarea,select{font-family:inherit;font-size:16px}
-.app{width:100%;max-width:440px;background:var(--bg);height:100svh;display:flex;flex-direction:column;position:relative;overflow:hidden}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 16px 8px;flex:none;position:sticky;top:0;z-index:10;background:var(--bg)}
+.app{width:100%;max-width:440px;background:var(--bg);position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;overflow:hidden}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 16px 8px;flex:none;background:var(--bg);z-index:10}
 .brand{display:flex;align-items:center;gap:8px}
 .mascot{width:30px;height:30px;border-radius:50%;background:var(--pink-soft);display:flex;align-items:center;justify-content:center;flex:none}
 .face{position:relative;width:15px;height:11px}
